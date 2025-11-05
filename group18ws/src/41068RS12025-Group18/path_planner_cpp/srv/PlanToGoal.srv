@@ -1,0 +1,8 @@
+# Request: Goal coordinates
+float64 x
+float64 y
+float64 z
+---
+# Response: Success and message
+bool success
+string message
