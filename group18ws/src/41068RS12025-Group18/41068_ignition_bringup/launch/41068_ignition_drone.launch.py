@@ -3,6 +3,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.substitutions import (Command, LaunchConfiguration,
                                   PathJoinSubstitution)
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
@@ -37,6 +38,13 @@ def generate_launch_description():
         description='Flag to launch Nav2'
     )
     ld.add_action(nav2_launch_arg)
+
+    color_detection_launch_arg = DeclareLaunchArgument(
+        'color_detection',
+        default_value='False',
+        description='Flag to launch camera-based tree color detection'
+    )
+    ld.add_action(color_detection_launch_arg)
 
     # Load robot_description and start robot_state_publisher
     robot_description_content = ParameterValue(
@@ -133,5 +141,22 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('nav2'))
     )
     ld.add_action(nav2)
+
+    # Camera-based tree color detection (optional)
+    color_detection = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('drone_colour_detector'),
+                'launch',
+                'tree_detection.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'image_topic': '/camera/image'
+        }.items(),
+        condition=IfCondition(LaunchConfiguration('color_detection'))
+    )
+    ld.add_action(color_detection)
 
     return ld
