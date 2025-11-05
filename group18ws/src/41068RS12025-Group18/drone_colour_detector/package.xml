@@ -3,7 +3,7 @@
 <package format="3">
   <name>drone_colour_detector</name>
   <version>1.0.0</version>
-  <description>HSV color-based tree detector for drone aerial surveillance</description>
+  <description>HSV color-based tree detector for drone aerial surveillance with data logging and mission reporting</description>
   <maintainer email="group18@example.com">Group18</maintainer>
   <license>MIT</license>
 
@@ -17,6 +17,8 @@
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
