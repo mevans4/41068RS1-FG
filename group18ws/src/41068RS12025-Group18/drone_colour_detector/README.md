@@ -271,6 +271,45 @@ Prevents counting the same tree multiple times as drone moves:
 
 ## Troubleshooting
 
+### Executable Not Found Error
+
+**Problem:** `ros2 run drone_colour_detector hsv_calibrator` returns "No executable found"
+
+**Root Cause:** The package was built but executables weren't installed to the correct location.
+
+**Solutions:**
+
+1. **Clean rebuild with proper setup.cfg:**
+   ```bash
+   cd ~/41068_ws
+   rm -rf build/drone_colour_detector install/drone_colour_detector
+   colcon build --packages-select drone_colour_detector
+   source install/setup.bash
+   ```
+
+2. **Verify installation:**
+   ```bash
+   # Check if executables exist
+   ls -la ~/41068_ws/install/drone_colour_detector/lib/drone_colour_detector/
+
+   # Should show: hsv_calibrator and tree_detector
+   ```
+
+3. **Check package is found:**
+   ```bash
+   ros2 pkg list | grep drone_colour_detector
+   ```
+
+4. **Verify setup.cfg exists:**
+   The package now includes a `setup.cfg` file that tells setuptools where to install scripts. If it's missing, create one with:
+   ```ini
+   [develop]
+   script_dir=$base/lib/drone_colour_detector
+
+   [install]
+   install_scripts=$base/lib/drone_colour_detector
+   ```
+
 ### No Detections
 
 **Problem:** `tree_counts` shows `[0, 0]`
