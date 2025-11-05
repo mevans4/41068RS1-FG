@@ -18,6 +18,7 @@ find_package(std_msgs REQUIRED)
 add_executable(drone_controller_node src/drone_controller.cpp)
 add_executable(mission_node src/mission_node.cpp)
 add_executable(altitude_controller src/altitude_controller.cpp)
+add_executable(forest_mission_orchestrator src/forest_mission_orchestrator.cpp)
 
 ament_target_dependencies(drone_controller_node
   rclcpp
@@ -33,16 +34,26 @@ ament_target_dependencies(mission_node
   std_msgs
 )
 
-ament_target_dependencies(altitude_controller 
-  rclcpp 
-  geometry_msgs 
+ament_target_dependencies(altitude_controller
+  rclcpp
+  geometry_msgs
   nav_msgs
+)
+
+ament_target_dependencies(forest_mission_orchestrator
+  rclcpp
+  rclcpp_action
+  nav2_msgs
+  geometry_msgs
+  nav_msgs
+  std_msgs
 )
 
 install(TARGETS
   drone_controller_node
   mission_node
   altitude_controller
+  forest_mission_orchestrator
   DESTINATION lib/${PROJECT_NAME}
 )
 

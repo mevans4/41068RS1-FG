@@ -185,14 +185,43 @@ private:
         return { sx / n, sy / n };
     }
 
-    // compute width as max distance between any two points in cluster
+    // Improved tree width calculation using robust diameter estimation
+    // Method: Calculate distances from centroid, use median to filter outliers, diameter = 2*median_radius
     double cluster_width(const std::vector<std::pair<double,double>>& pts) const
     {
-        double maxd = 0.0;
-        for (size_t i = 0; i < pts.size(); ++i)
-            for (size_t j = i + 1; j < pts.size(); ++j)
-                maxd = std::max(maxd, std::hypot(pts[i].first - pts[j].first, pts[i].second - pts[j].second));
-        return maxd;
+        if (pts.empty()) return 0.0;
+
+        // Get centroid
+        auto centroid = cluster_centroid(pts);
+
+        // Calculate distances from centroid for all points
+        std::vector<double> distances;
+        distances.reserve(pts.size());
+        for (const auto& p : pts) {
+            double dist = std::hypot(p.first - centroid.first, p.second - centroid.second);
+            distances.push_back(dist);
+        }
+
+        // Use median distance as robust radius estimate (resistant to outliers)
+        std::sort(distances.begin(), distances.end());
+        double median_radius;
+        size_t n = distances.size();
+        if (n % 2 == 0) {
+            median_radius = (distances[n/2 - 1] + distances[n/2]) / 2.0;
+        } else {
+            median_radius = distances[n/2];
+        }
+
+        // Also calculate 75th percentile for better coverage of actual tree diameter
+        // Trees are cylinders, so we want to capture the full width, not just average
+        size_t p75_idx = static_cast<size_t>(n * 0.75);
+        double p75_radius = distances[std::min(p75_idx, n-1)];
+
+        // Average median and 75th percentile for robust estimate
+        double robust_radius = (median_radius + p75_radius) / 2.0;
+
+        // Diameter = 2 * radius
+        return 2.0 * robust_radius;
     }
 
         void publish_known_tree_widths()
