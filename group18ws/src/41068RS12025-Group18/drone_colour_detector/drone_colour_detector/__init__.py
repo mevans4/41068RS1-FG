@@ -1,1 +1,0 @@
-# Drone Colour Detector Package
